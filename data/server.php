@@ -1,22 +1,18 @@
 <?php
 session_start();
 
-fuction getIdentity() {
-    return substr($_SERVER['REQUEST_URI'], strrpos($_SERVER['REQUEST_URI'], '?') + 1);
+function getIdentity() {
+    return 'registration';
 }
 
+$email = "";
 $firstName = "";
 $lastName = "";
 $errors = array();
-$identity = getIdentity();
+$dbName = getIdentity();
 
 //need to change when connectting to cloud
-if(identity === 'customer')
-    #db = mysqli_connect('localhost', 'root', '', 'customerData');
-else if(identity === 'driver')
-    #db = mysqli_connect('localhost', 'root', '', 'driverData');
-else if(identity === 'admin')
-    #db = mysqli_connect('localhost', 'root', '', 'adminData');
+#db = mysqli_connect('localhost', 'root', '', $dbName);
 
 if(isset($_POST['reg'])) {
     $email = mysqli_real_escape_string($db, $_POST['email']);

@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>Registration</title>
-    <link rel="regStyle" type="text/css" href="../css/regStyle.css"
+    <link type="text/css" rel="styleSheet" href="../css/regStyle.css">
 </head>
 <body>
     <header>
@@ -24,10 +24,6 @@
         <div>
             <label>Confirm Password</label>
             <input type="password" name="passwordConfirm">
-        </div>
-        <div>
-            <label>Username</label>
-            <input type="text" name="username" value="<?php echo $username; ?>">
         </div>
         <div>
             <label>First Name</label>
