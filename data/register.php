@@ -11,7 +11,7 @@
         <h1>Registration</h1>
     </header>
 
-    <form method="post" action="register.php">
+    <form action="register.php?<?php echo $identity; ?>"" method="post">
         <?php include('error.php'); ?>
         <div>
             <label>Email</label>
@@ -20,8 +20,6 @@
         <div>
             <label>Password</label>
             <input type="password" name="password">
-        </div>
-        <div>
             <label>Confirm Password</label>
             <input type="password" name="passwordConfirm">
         </div>

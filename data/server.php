@@ -1,18 +1,14 @@
 <?php
 session_start();
 
-function getIdentity() {
-    return 'registration';
-}
-
 $email = "";
 $firstName = "";
 $lastName = "";
 $errors = array();
-$dbName = getIdentity();
-
+$identity = $_SERVER['QUERY_STRING'];
+echo $identity;
 //need to change when connectting to cloud
-#db = mysqli_connect('localhost', 'root', '', $dbName);
+$db = mysqli_connect('localhost', 'root', '19910225', 'registration');
 
 if(isset($_POST['reg'])) {
     $email = mysqli_real_escape_string($db, $_POST['email']);
@@ -37,8 +33,8 @@ if(isset($_POST['reg'])) {
     }
 
     if (count($errors) == 0) {
-        $query = "INSERT INTO users (email, password, firstName, lastName)
-  			      VALUES('$email', '$password', 'firstName', 'lastName')";
+        $query = "INSERT INTO ".$identity." (email, password, firstName, lastName)
+  			      VALUES('$email', '$password', '$firstName', '$lastName')";
   	    mysqli_query($db, $query);
         header('location: ../index.html');
     }
@@ -47,18 +43,15 @@ if(isset($_POST['reg'])) {
 if(isset($_POST['login'])) {
     $email = mysqli_real_escape_string($db, $_POST['email']);
     $password = mysqli_real_escape_string($db, $_POST['password']);
-
-    if (empty($email))
-        array_push($errors, "empty email");
-    if (empty($password))
-        array_push($errors, "empty password");
-
+    if (empty($email)) array_push($errors, "empty email");
+    if (empty($password)) array_push($errors, "empty password");
     if (count($errors) == 0) {
-        $query = "SELECT * FROM users WHERE email='$email' AND password='$password'";
+        $query = "SELECT * FROM $identity WHERE email='$email' AND password='$password'";
+        echo $query;
         $results = mysqli_query($db, $query);
         if (mysqli_num_rows($results) == 1) {
             $_SESSION['username'] = $firstName." ".$lastName;
-            header('location: ../index.html');
+            header("Location: ".$identity.".php");
         } else {
             array_push($errors, "Wrong login information");
         }

@@ -10,8 +10,8 @@
         <h2>Login</h2>
     </div>
 
-    <form method="post" action="login.php">
-        <?php include('errors.php'); ?>
+    <form method="post" action="login.php?<?php echo $identity; ?>"">
+        <?php include('error.php'); ?>
         <div>
             <label>email</label>
   		    <input type="email" name="email" >
@@ -20,11 +20,11 @@
   		    <label>Password</label>
   		    <input type="password" name="password">
   	    </div>
-  	<div class="input-group">
+  	<div>
   		<button type="submit" name="login">Login</button>
   	</div>
   	<p>
-  		Not yet a member? <a href="register.php">Sign up</a>
+  		Not yet a member? <a href="register.php?<?php echo $identity; ?>">Sign up</a>
   	</p>
   </form>
 </body>
