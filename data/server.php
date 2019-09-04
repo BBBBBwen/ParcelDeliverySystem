@@ -42,13 +42,13 @@ if(isset($_POST['login'])) {
     $password = mysqli_real_escape_string($db, $_POST['password']);
     if (empty($email)) array_push($errors, "empty email");
     if (empty($password)) array_push($errors, "empty password");
-    
+
     if (count($errors) == 0) {
         $query = "SELECT * FROM $identity WHERE email='$email' AND password='$password'";
-        echo $query;
         $results = mysqli_query($db, $query);
         if (mysqli_num_rows($results) == 1) {
-            $_SESSION['username'] = $firstName." ".$lastName;
+            $user = mysqli_fetch_assoc($results);
+            $_SESSION['username'] = $user['firstName']." ".$user['lastName'];
             header("Location: ".$identity.".php");
         } else {
             array_push($errors, "Wrong login information");
