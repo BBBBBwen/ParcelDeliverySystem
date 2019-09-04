@@ -2,13 +2,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Registration system PHP and MySQL</title>
-    <link type="text/css" rel="styleSheet"  href="../css/regStyle.css">
+    <title>Login</title>
+    <link type="text/css" rel="styleSheet" href="../css/regStyle.css">
 </head>
 <body>
-    <div class="header">
-        <h2>Login</h2>
-    </div>
+    <header>
+        <a href="/"><img src="images/logo.png" alt="Logo"></a>
+        <h1>Login</h1>
+    </header>
 
     <form method="post" action="login.php?<?php echo $identity; ?>"">
         <?php include('error.php'); ?>
@@ -28,4 +29,5 @@
   	</p>
   </form>
 </body>
+
 </html>
