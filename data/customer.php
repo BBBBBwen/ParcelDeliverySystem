@@ -64,7 +64,7 @@ if(isset($_POST['book'])) {
                 while($row = mysqli_fetch_array($result))
                 {
                 echo "<tr>";
-                echo "<td>" . $row['parcelName'] . "</td>";
+                echo "<td><a href='parcelDetail.php?".$row['parcelName']."' target='_blank'>" . $row['parcelName'] . "</a></td>";
                 echo "<td>" . $row['senderAddress'] . "</td>";
                 echo "<td>" . $row['recieverName'] . "</td>";
                 echo "<td>" . $row['recieverAddress'] . "</td>";
