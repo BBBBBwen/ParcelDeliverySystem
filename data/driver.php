@@ -1,34 +1,37 @@
 <?php
 session_start();
 
-$db = mysqli_connect('localhost', 'root', '19910225', 'registration');
+require 'connectDB.php';
 
-$result = mysqli_query($db,"SELECT * FROM parcelDetail WHERE status='processing' LIMIT 1");
-if(isset($_SESSION["id"])) $result = mysqli_query($db,"SELECT * FROM parcelDetail WHERE id=$_SESSION['id'] LIMIT 1");
-$user = mysqli_fetch_array($result);
-
-$id = $user['id'];
-$parcelName = $user['parcelName'];
-$senderAddress = $user['senderAddress'];
-$recieverName = $user['recieverName'];
-$recieverAddress = $user['recieverAddress'];
-$recieverPhoneNumber = $user['recieverPhoneNumber'];
-$pickUpDate = $user['pickUpDate'] == null ? '-' : $user['pickUpDate'];
-$endDate = $user['endDate'] == null ? '-' : $user['endDate'];
-$status = $user['status'];
+$sql = "SELECT * FROM parcel WHERE status='processing' LIMIT 1";
+if(isset($_SESSION['parcelID'])) $sql = "SELECT * FROM parcel WHERE id=:id";
+$stmt = $db->prepare($sql);
+$stmt->bindValue(':id', $_SESSION['parcelID']);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if(isset($_POST['pickUp'])) {
     $currentDate = date('Y/m/d H:i:s');
-    mysqli_query($db,"UPDATE parcelDetail SET status='delivering', pickUpDate='$currentDate' WHERE parcelName='$parcelName'");
-    $_SESSION['id'] = $id;
+    $sql = "UPDATE parcel SET driverID = :driverID, status='delivering', pickUpDate=:currentDate WHERE id=:id";
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':driverID', $_SESSION['id']);
+    $stmt->bindValue(':currentDate', $currentDate);
+    $stmt->bindValue(':id', $user['id']);
+    $stmt->execute();
+
+    $_SESSION['parcelID'] = $user['id'];
     header("Refresh:0");
 }
 
 if(isset($_POST['delivered'])) {
     $currentDate = date('Y/m/d H:i:s');
-    mysqli_query($db,"UPDATE parcelDetail SET status='done', endDate='$currentDate' WHERE parcelName='$parcelName'");
-    if(isset($_SESSION["id"])){
-        unset($_SESSION["id"]);
+    $sql = "UPDATE parcel SET status='done', endDate=:currentDate WHERE id=:id";
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':currentDate', $currentDate);
+    $stmt->bindValue(':id', $_SESSION['parcelID']);
+    $stmt->execute();
+    if(isset($_SESSION["parcelID"])){
+        unset($_SESSION["parcelID"]);
     }
     header("Refresh:0");
 }
@@ -49,31 +52,32 @@ if(isset($_POST['delivered'])) {
         <h1>Welcome <?php echo $_SESSION['username']; ?></h1>
     </header>
     <main>
+        <?php if($user) : ?>
         <h2>Current Job</h2>
         <form action='<?php $_SEVER['PHP_SELF'];?>' method='POST'>
         <div>
-            parcelName: <p><?php echo $parcelName; ?></p>
+            parcelName: <p><?php echo $user['parcelName']; ?></p>
         </div>
         <div>
-            senderAddress: <p><?php echo $senderAddress; ?></p>
+            senderAddress: <p><?php echo $user['senderAddress']; ?></p>
         </div>
         <div>
-            recieverName: <p><?php echo $recieverName; ?></p>
+            recieverName: <p><?php echo $user['recieverName']; ?></p>
         </div>
         <div>
-            recieverAddress: <p><?php echo $recieverAddress; ?></p>
+            recieverAddress: <p><?php echo $user['recieverAddress']; ?></p>
         </div>
         <div>
-            recieverPhoneNumber: <p><?php echo $recieverPhoneNumber; ?></p>
+            recieverPhoneNumber: <p><?php echo $user['recieverPhoneNumber']; ?></p>
         </div>
         <div>
-            pickUpDate: <p><?php echo $pickUpDate; ?></p>
+            pickUpDate: <p><?php echo $user['pickUpDate']; ?></p>
         </div>
         <div>
-            endDate: <p><?php echo $endDate; ?></p>
+            endDate: <p><?php echo $user['endDate']; ?></p>
         </div>
         <div>
-            status: <p><?php echo $status; ?></p>
+            status: <p><?php echo $user['status']; ?></p>
         </div>
         <button type='submit' name='pickUp'>
             <a>pick Up</a>
@@ -82,6 +86,7 @@ if(isset($_POST['delivered'])) {
             <a>Delivered</a>
         </button>
         </form>
+        <?php endif; ?>
     </main>
 </body>
 

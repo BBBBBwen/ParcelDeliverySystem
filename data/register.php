@@ -15,7 +15,7 @@
         <?php include('error.php'); ?>
         <div>
             <label>Email</label>
-            <input type="email" name="email" value="<?php echo $email; ?>">
+            <input type="email" name="email">
         </div>
         <div>
             <label>Password</label>
@@ -25,9 +25,9 @@
         </div>
         <div>
             <label>First Name</label>
-            <input type="text" name="firstName" value="<?php echo $firstName; ?>">
+            <input type="text" name="firstName">
             <label>Last Name</label>
-            <input type="text" name="lastName" value="<?php echo $lastName; ?>">
+            <input type="text" name="lastName">
         </div>
         <div>
             <button type="submit" name="reg">Register</button>

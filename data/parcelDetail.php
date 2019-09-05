@@ -1,9 +1,13 @@
 <?php
-$name = $_SERVER['QUERY_STRING'];
+$id = $_SERVER['QUERY_STRING'];
 
-$db = mysqli_connect('localhost', 'root', '19910225', 'registration');
-$result = mysqli_query($db,"SELECT * FROM parcelDetail WHERE parcelName='$name' LIMIT 1");
-$user = mysqli_fetch_array($result);
+require 'connectDB.php';
+
+$sql = "SELECT * FROM parcel WHERE id = :id LIMIT 1";
+$stmt = $db->prepare($sql);
+$stmt->bindValue(':id', $id);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $senderAddress = $user['senderAddress'];
 $recieverName = $user['recieverName'];

@@ -1,34 +1,29 @@
 <?php
 session_start();
 
-$parcelName = "";
-$senderAddress = "";
-$recieverName = "";
-$recieverAddress = "";
-$recieverPhoneNumber = "";
 $errors = array();
 
-//need to change when connectting to cloud
-$db = mysqli_connect('localhost', 'root', '19910225', 'registration');
+require 'connectDB.php';
 
 if(isset($_POST['book'])) {
-    $parcelName = mysqli_real_escape_string($db, $_POST['parcelName']);
-    $senderAddress = mysqli_real_escape_string($db, $_POST['senderAddress']);
-    $recieverName = mysqli_real_escape_string($db, $_POST['recieverName']);
-    $recieverAddress = mysqli_real_escape_string($db, $_POST['recieverAddress']);
-    $recieverPhoneNumber = mysqli_real_escape_string($db, $_POST['recieverPhoneNumber']);
-
-    if (empty($parcelName)) { array_push($errors, "empty parcelName"); }
-    if (empty($senderAddress)) { array_push($errors, "empty senderAddress"); }
-    if (empty($recieverName)) { array_push($errors, "empty recieverName"); }
-    if (empty($recieverAddress)) { array_push($errors, "empty recieverAddress"); }
-    if (empty($recieverPhoneNumber)) { array_push($errors, "empty recieverPhoneNumber"); }
+    if (empty($_POST['parcelName'])) array_push($errors, "empty parcelName");
+    if (empty($_POST['recieverName'])) array_push($errors, "empty recieverName");
+    if (empty($_POST['recieverAddress'])) array_push($errors, "empty recieverAddress");
+    if (empty($_POST['recieverPhoneNumber'])) array_push($errors, "empty recieverPhoneNumber");
 
     if (count($errors) == 0) {
-        $query = "INSERT INTO parcelDetail (parcelName, senderAddress, recieverName, recieverAddress, recieverPhoneNumber, status)
-  			      VALUES('$parcelName', '$senderAddress', '$recieverName', '$recieverAddress', '$recieverPhoneNumber', 'processing')";
-  	    mysqli_query($db, $query);
-        header('location: /');
+        $sql = "INSERT INTO parcel (parcelName, customerID, recieverName, recieverAddress, recieverPhoneNumber, status)
+  			      VALUES(:parcelName, :customerID, :recieverName, :recieverAddress, :recieverPhoneNumber, :status)";
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(':parcelName', $_POST['parcelName']);
+        $stmt->bindValue(':customerID', $_SESSION['id']);
+        $stmt->bindValue(':recieverName', $_POST['recieverName']);
+        $stmt->bindValue(':recieverAddress', $_POST['recieverAddress']);
+        $stmt->bindValue(':recieverPhoneNumber', $_POST['recieverPhoneNumber']);
+        $stmt->bindValue(':status', 'processing');
+        $result = $stmt->execute();
+        if($result) header("Refresh:0");
+        else array_push($errors, "fail to book job");
     }
 }
 ?>
@@ -45,27 +40,27 @@ if(isset($_POST['book'])) {
 <body>
     <header>
         <a href="/"><img src="images/logo.png" alt="Logo"></a>
-        <h1>Welcome <?php echo $_SESSION['username']; ?></h1>
+        <h1>Welcome <?php echo $_SESSION['username'];?></h1>
     </header>
     <main>
         <div>
             <?php
-                $result = mysqli_query($db,"SELECT * FROM parcelDetail LIMIT 10");
+                $sql = "SELECT * FROM parcel LIMIT 10";
+                $stmt = $db->prepare($sql);
+                $stmt->execute();
                 echo "<table border='1'>
                 <tr>
                     <th>parcelName</th>
-                    <th>senderAddress</th>
                     <th>recieverName</th>
                     <th>recieverAddress</th>
                     <th>recieverPhoneNumber</th>
                     <th>status</th>
                 </tr>";
 
-                while($row = mysqli_fetch_array($result))
+                while($row = $stmt->fetch(PDO::FETCH_ASSOC))
                 {
                 echo "<tr>";
-                echo "<td><a href='parcelDetail.php?".$row['parcelName']."' target='_blank'>" . $row['parcelName'] . "</a></td>";
-                echo "<td>" . $row['senderAddress'] . "</td>";
+                echo "<td><a href='parcelDetail.php?".$row['id']."' target='_blank'>" . $row['parcelName'] . "</a></td>";
                 echo "<td>" . $row['recieverName'] . "</td>";
                 echo "<td>" . $row['recieverAddress'] . "</td>";
                 echo "<td>" . $row['recieverPhoneNumber'] . "</td>";
@@ -92,31 +87,31 @@ if(isset($_POST['book'])) {
                         <label>parcelName</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='parcelName' class='input' value='<?php echo $parcelName; ?>' placeholder='enter parcel's Name' required />
+                        <input type='text' name='parcelName' class='input' value='<?php echo $parcelName; ?>' required />
                     </div>
                     <div class='alignt'>
                         <label>senderAddress</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='senderAddress' class='input' value='<?php echo $senderAddress; ?>' placeholder='enter sender's Address' required />
+                        <input type='text' name='senderAddress' class='input' value='<?php echo $senderAddress; ?>' required />
                     </div>
                     <div class='alignt'>
                         <label>recieverName</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='recieverName' class='input' value='<?php echo $recieverName; ?>' placeholder='enter reciever's Name' required />
+                        <input type='text' name='recieverName' class='input' value='<?php echo $recieverName; ?>' required />
                     </div>
                     <div class='alignt'>
                         <label>recieverAddress</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='recieverAddress' class='input' value='<?php echo $recieverAddress; ?>' placeholder='enter reciever's Address' required />
+                        <input type='text' name='recieverAddress' class='input' value='<?php echo $recieverAddress; ?>' required />
                     </div>
                     <div class='alignt'>
                         <label>recieverPhoneNumber</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='recieverPhoneNumber' class='input' value='<?php echo $recieverPhoneNumber; ?>' placeholder='enter reciever's PhoneNumber' required />
+                        <input type='text' name='recieverPhoneNumber' class='input' value='<?php echo $recieverPhoneNumber; ?>' />
                     </div>
                     <div class='alignt'>
                         <button type='submit' class='btn' name='book'>Book</button>
