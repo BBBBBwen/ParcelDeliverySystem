@@ -23,11 +23,12 @@ if(isset($_POST['reg'])) {
         array_push($errors, "email already exists");
 
     if (count($errors) == 0) {
+        $hash = password_hash($_POST['password'], PASSWORD_BCRYPT);
         $sql = "INSERT INTO ".$identity." (email, password, firstName, lastName)
   			      VALUES(:email, :password, :firstName, :lastName)";
   	    $stmt = $db->prepare($sql);
         $stmt->bindValue(':email', $_POST['email']);
-        $stmt->bindValue(':password', $_POST['password']);
+        $stmt->bindValue(':password', $hash);
         $stmt->bindValue(':firstName', $_POST['firstName']);
         $stmt->bindValue(':lastName', $_POST['lastName']);
         $result = $stmt->execute();
@@ -41,14 +42,16 @@ if(isset($_POST['login'])) {
     if (empty($_POST['password'])) { array_push($errors, "empty password"); }
 
     if (count($errors) == 0) {
-        $query = "SELECT * FROM $identity WHERE email=:email AND password=:password";
+        $query = "SELECT * FROM $identity WHERE email=:email";
         $stmt = $db->prepare($query);
         $stmt->bindValue(':email', $_POST['email']);
-        $stmt->bindValue(':password', $_POST['password']);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($user) {
+        if ($user && password_verify($_POST['password'], $user['password'])) {
+            if(isset($_SESSION['username'])) unset($_SESSION['username']);
             $_SESSION['username'] = $user['firstName']." ".$user['lastName'];
+
+            if(isset($_SESSION['id'])) unset($_SESSION['id']);
             $_SESSION['id'] = $user['id'];
             header("Location: ".$identity.".php");
         } else {

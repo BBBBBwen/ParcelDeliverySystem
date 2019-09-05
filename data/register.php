@@ -11,7 +11,7 @@
         <h1>Registration</h1>
     </header>
 
-    <form action="register.php?<?php echo $identity; ?>"" method="post">
+    <form action="register.php?<?php echo $identity; ?>" method="post">
         <?php include('error.php'); ?>
         <div>
             <label>Email</label>

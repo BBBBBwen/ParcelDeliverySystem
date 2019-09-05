@@ -2,12 +2,21 @@
 $id = $_SERVER['QUERY_STRING'];
 
 require 'connectDB.php';
-
 $sql = "SELECT * FROM parcel WHERE id = :id LIMIT 1";
 $stmt = $db->prepare($sql);
 $stmt->bindValue(':id', $id);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT * FROM driver WHERE id = :id LIMIT 1";
+$stmt = $db->prepare($sql);
+$stmt->bindValue(':id', $user['driverID']);
+$stmt->execute();
+$driver = $stmt->fetch(PDO::FETCH_ASSOC);
+$geocodeFromLatLong = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng=".$driver['lastKnowCoordinate']."&sensor=false&key=AIzaSyB4VlCHHZgZ1rrsEY9S-LtYdMz-f858Dig");
+$output = json_decode($geocodeFromLatLong);
+$status = $output->status;
+$address = ($status=="OK")?$output->results[1]->formatted_address:'';
 
 $senderAddress = $user['senderAddress'];
 $recieverName = $user['recieverName'];
@@ -60,7 +69,10 @@ $status = $user['status'];
             <label>status</label>
             <p><?php echo $status; ?></p>
         </div>
-
+        <div>
+            <label>location</label>
+            <p><?php echo $address; ?></p>
+        </div>
     </main>
 
 </body>

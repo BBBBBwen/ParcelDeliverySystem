@@ -2,6 +2,8 @@
 session_start();
 
 require 'connectDB.php';
+$_SESSION['driverID'] = $_SESSION['id'];
+require 'tracking.php';
 
 $sql = "SELECT * FROM parcel WHERE status='processing' LIMIT 1";
 if(isset($_SESSION['parcelID'])) $sql = "SELECT * FROM parcel WHERE id=:id";
@@ -30,6 +32,7 @@ if(isset($_POST['delivered'])) {
     $stmt->bindValue(':currentDate', $currentDate);
     $stmt->bindValue(':id', $_SESSION['parcelID']);
     $stmt->execute();
+
     if(isset($_SESSION["parcelID"])){
         unset($_SESSION["parcelID"]);
     }
@@ -86,6 +89,8 @@ if(isset($_POST['delivered'])) {
             <a>Delivered</a>
         </button>
         </form>
+        <?php else: ?>
+            <h2>No job current available</h2>
         <?php endif; ?>
     </main>
 </body>

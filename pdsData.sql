@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `customer`;
 CREATE TABLE IF NOT EXISTS `customer` (
   `id` int(100) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `firstName` varchar(20) NOT NULL,
   `lastName` varchar(20) NOT NULL,
   `address` varchar(100) DEFAULT NULL,
@@ -49,11 +49,12 @@ DROP TABLE IF EXISTS `driver`;
 CREATE TABLE IF NOT EXISTS `driver` (
   `id` int(100) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `firstName` varchar(20) NOT NULL,
   `lastName` varchar(20) NOT NULL,
   `total` int(100) NOT NULL DEFAULT '0',
   `paid` int(100) NOT NULL DEFAULT '0',
+  `lastKnowCoordinate` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS `parcel` (
   `pickUpDate` varchar(100) DEFAULT NULL,
   `endDate` varchar(100) DEFAULT NULL,
   `status` varchar(100) NOT NULL DEFAULT 'processing',
+  `payment` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 COMMIT;

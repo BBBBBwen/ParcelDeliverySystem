@@ -1,0 +1,5 @@
+cron:
+- description: "tracking"
+  url: /data/tracking.php
+  target: service1
+  schedule: every 1 minutes

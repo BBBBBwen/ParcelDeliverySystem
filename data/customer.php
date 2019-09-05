@@ -2,7 +2,6 @@
 session_start();
 
 $errors = array();
-
 require 'connectDB.php';
 
 if(isset($_POST['book'])) {
@@ -10,10 +9,21 @@ if(isset($_POST['book'])) {
     if (empty($_POST['recieverName'])) array_push($errors, "empty recieverName");
     if (empty($_POST['recieverAddress'])) array_push($errors, "empty recieverAddress");
     if (empty($_POST['recieverPhoneNumber'])) array_push($errors, "empty recieverPhoneNumber");
-
+    $sql = "SELECT * FROM customer WHERE id=:id";
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':id', $_SESSION['id']);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user['address'] == null) array_push($errors, "empty address");
     if (count($errors) == 0) {
-        $sql = "INSERT INTO parcel (parcelName, customerID, recieverName, recieverAddress, recieverPhoneNumber, status)
-  			      VALUES(:parcelName, :customerID, :recieverName, :recieverAddress, :recieverPhoneNumber, :status)";
+        $distanceData = file_get_contents("https://maps.googleapis.com/maps/api/distancematrix/json?&origins=".urlencode($user['address'])."&destinations=".urlencode($_POST['recieverAddress'])."&key=AIzaSyB4VlCHHZgZ1rrsEY9S-LtYdMz-f858Dig");
+        $data = json_decode($distanceData);
+        $distance = floor($data->rows[0]->elements[0]->distance->value / 1000);
+        echo $data->rows[0]->elements[0]->distance->value;
+        echo "dis: ".$distance;
+
+        $sql = "INSERT INTO parcel (parcelName, customerID, recieverName, recieverAddress, recieverPhoneNumber, status, payment)
+  			      VALUES(:parcelName, :customerID, :recieverName, :recieverAddress, :recieverPhoneNumber, :status, :payment)";
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':parcelName', $_POST['parcelName']);
         $stmt->bindValue(':customerID', $_SESSION['id']);
@@ -21,6 +31,7 @@ if(isset($_POST['book'])) {
         $stmt->bindValue(':recieverAddress', $_POST['recieverAddress']);
         $stmt->bindValue(':recieverPhoneNumber', $_POST['recieverPhoneNumber']);
         $stmt->bindValue(':status', 'processing');
+        $stmt->bindValue(':payment', $distance);
         $result = $stmt->execute();
         if($result) header("Refresh:0");
         else array_push($errors, "fail to book job");
@@ -40,6 +51,7 @@ if(isset($_POST['book'])) {
 <body>
     <header>
         <a href="/"><img src="images/logo.png" alt="Logo"></a>
+        <a href="\data\profile.php"><img src="images/profile.png" alt="profile"></a>
         <h1>Welcome <?php echo $_SESSION['username'];?></h1>
     </header>
     <main>
@@ -55,16 +67,17 @@ if(isset($_POST['book'])) {
                     <th>recieverAddress</th>
                     <th>recieverPhoneNumber</th>
                     <th>status</th>
+                    <th>payment</th>
                 </tr>";
 
-                while($row = $stmt->fetch(PDO::FETCH_ASSOC))
-                {
+                while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
                 echo "<td><a href='parcelDetail.php?".$row['id']."' target='_blank'>" . $row['parcelName'] . "</a></td>";
                 echo "<td>" . $row['recieverName'] . "</td>";
                 echo "<td>" . $row['recieverAddress'] . "</td>";
                 echo "<td>" . $row['recieverPhoneNumber'] . "</td>";
                 echo "<td>" . $row['status'] . "</td>";
+                echo "<td>" . $row['payment'] . "</td>";
                 echo "</tr>";
                 }
                 echo "</table>"; ?>
@@ -87,31 +100,25 @@ if(isset($_POST['book'])) {
                         <label>parcelName</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='parcelName' class='input' value='<?php echo $parcelName; ?>' required />
-                    </div>
-                    <div class='alignt'>
-                        <label>senderAddress</label>
-                    </div>
-                    <div class='alignt'>
-                        <input type='text' name='senderAddress' class='input' value='<?php echo $senderAddress; ?>' required />
+                        <input type='text' name='parcelName' class='input' required />
                     </div>
                     <div class='alignt'>
                         <label>recieverName</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='recieverName' class='input' value='<?php echo $recieverName; ?>' required />
+                        <input type='text' name='recieverName' class='input' required />
                     </div>
                     <div class='alignt'>
                         <label>recieverAddress</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='recieverAddress' class='input' value='<?php echo $recieverAddress; ?>' required />
+                        <input type='text' name='recieverAddress' class='input' required />
                     </div>
                     <div class='alignt'>
                         <label>recieverPhoneNumber</label>
                     </div>
                     <div class='alignt'>
-                        <input type='text' name='recieverPhoneNumber' class='input' value='<?php echo $recieverPhoneNumber; ?>' />
+                        <input type='text' name='recieverPhoneNumber' class='input' required />
                     </div>
                     <div class='alignt'>
                         <button type='submit' class='btn' name='book'>Book</button>
