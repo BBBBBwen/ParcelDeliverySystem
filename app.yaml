@@ -5,6 +5,12 @@ handlers:
 - url: /css
   static_dir: css
 
+- url: /js
+  static_dir: js
+
+- url: /content/(.+\.php)$
+  script: /content/\1
+
 - url: /data/(.+\.php)$
   script: /data/\1
 
@@ -15,6 +21,7 @@ handlers:
   script: index.php
 
 env_variables:
-  CLOUDSQL_DSN:  mysql:dbname=pdsData;unix_socket=/cloudsql/isys1106-pds:australia-southeast1:sepm-assginment
+  # CLOUDSQL_DSN:  mysql:dbname=pdsData;unix_socket=/cloudsql/isys1106-pds:australia-southeast1:sepm-assginment
+  CLOUDSQL_DSN: mysql:host=localhost;dbname=pdsData
   CLOUDSQL_USER: root
-  CLOUDSQL_PASSWORD: 123456
+  CLOUDSQL_PASSWORD: password

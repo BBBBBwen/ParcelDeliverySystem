@@ -1,33 +1,34 @@
-<?php include('server.php') ?>
+<?php include("serverV2.php"); ?>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Login</title>
-    <link type="text/css" rel="styleSheet" href="../css/regStyle.css">
-</head>
+
+<?php include_once("content/head.php"); ?>
+
 <body>
-    <header>
-        <a href="/"><img src="images/logo.png" alt="Logo"></a>
-        <h1>Login</h1>
-    </header>
+    
+    <?php include_once("content/header.php"); ?>
 
-    <form method="post" action="login.php?<?php echo $identity; ?>"">
-        <?php include('error.php'); ?>
-        <div>
-            <label>email</label>
-  		    <input type="email" name="email" >
-  	    </div>
-  	    <div>
-  		    <label>Password</label>
-  		    <input type="password" name="password">
-  	    </div>
-  	<div>
-  		<button type="submit" name="login">Login</button>
-  	</div>
-  	<p>
-  		Not yet a member? <a href="register.php?<?php echo $identity; ?>">Sign up</a>
-  	</p>
-  </form>
+    <div class="container">
+
+        <div class="row justify-content-md-center">
+            <div class="col-md-6 col-md-offset-3">
+                <h1>Log in</h1>
+                <form method="POST" action="login.php">
+                    <?php include('error.php'); ?>
+
+                    <label>Email</label>
+                    <input class="input_box form-control" type="email" name="email">
+                    <label>Password</label>
+                    <input class="input_box form-control" type="password" name="password">
+                    
+  		            <button type="submit" name="login" class="btn btn-primary">Login</button>
+  	                <p>Not yet a member? <a href="register.php">Sign up</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  <?php include_once("content/foot.php"); ?>
+
 </body>
-
 </html>
