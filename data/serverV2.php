@@ -183,18 +183,89 @@ if(isset($_POST['booking'])) {
     }
 }
 
-function driverLogon($id, $db) {
-    $sql = "UPDATE drivers SET status='online' WHERE id=?";
-    $stmt = $db->prepare($sql);
-    $result = $stmt->execute([$id]);
+/* For customer booking list */
+if($_GET['type'] == "current") {
+    $status = "< 3";
+} else {
+    $status = "= 3";
 }
 
+/* For header path */
 if($_SESSION['user']) {
     $path = 'customerV2.php';
 } else if($_SESSION['driver']) {
     $path = 'driverV2.php';
 } else {
     $path = '/';
+}
+
+/* Get all the booking for customer, current / history */
+function getAllBooking($status, $db) {
+    $sql = "SELECT a.parcelID, a.parcelName, a.receiverName, a.receiverAddress, a.receiverPhone, b.status, a.timestamp FROM bookings a JOIN parcel_status b ON a.parcelStatus = b.id WHERE a.customerID = ? AND a.parcelStatus ".$status; 
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$_SESSION['id']]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>";
+        echo "<a href='bookingDetails.php?data=".$row['parcelID']."'>".$row['parcelID']."</a>";
+        echo "</td>";
+        echo "<td>". $row['parcelName'] ."</td>";
+        echo "<td>". $row['receiverName'] ."</td>";
+        echo "<td>". $row['receiverAddress'] ."</td>";
+        echo "<td>". $row['receiverPhone'] ."</td>";
+        echo "<td>". $row['status'] ."</td>";
+        echo "<td>". $row['timestamp'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Get specific booking details */
+function getBookingDetails($parcelID, $db) {
+    $sql = "SELECT info, location, timestamp FROM parcel_location WHERE parcelID = ? order by timestamp ASC";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$parcelID]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>". $row['info'] ."</td>";
+        echo "<td>". $row['location'] ."</td>";
+        echo "<td>". $row['timestamp'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Display all message in inbox */
+function getMessage($user, $db) {
+    $sql = "SELECT parcelID, timestamp FROM inbox WHERE customerID = ? order by timestamp DESC";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>";
+        echo "<a href='message.php?data=".$row['parcelID']."'>".$row['parcelID']."</a>";
+        echo "</td>";
+        echo "<td>". $row['timestamp'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+function getMessageRemark($parcelID, $user, $db) {
+    $sql = "SELECT remark FROM inbox WHERE customerID = ? AND parcelID = ?";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user, $parcelID]);
+
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    echo $data['remark'];
+
+}
+
+function driverLogon($id, $db) {
+    $sql = "UPDATE drivers SET status='online' WHERE id=?";
+    $stmt = $db->prepare($sql);
+    $result = $stmt->execute([$id]);
 }
 
 function console_log( $data ){

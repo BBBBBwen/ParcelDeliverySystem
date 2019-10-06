@@ -8,6 +8,9 @@
             <div class="collapse navbar-collapse" id="navbarToggler">
                 <ul class="nav navbar-nav ml-auto">
                     <li class="nav-item">
+                    <?php if(isset($_SESSION['user'])) {
+                        echo '<a class="btn btn-outline-warning" href="../data/customerInbox.php">Inbox</a>';
+                    } ?>
                     <?php if(isset($_SESSION['id'])) {
                         echo '<a class="btn btn-outline-info" href="../data/profileV2.php">Profile</a>';
                     } else {

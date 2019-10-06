@@ -1,4 +1,4 @@
-<?
+<?php
 include("getTask.php");
 include("serverV2.php");
 ?>
@@ -29,8 +29,11 @@ include("serverV2.php");
             <form method="POST" action="#">
                 <button type="submit" name="picked" class="btn btn-primary">Picked Up</button>
                 <button type="submit" name="delivered" class="btn btn-warning">Delivered</button>
+                <a class="btn btn-info" href="remark.php">Remark</a>
             </form>
         </div>
     </div>
+
+    <?php include_once("content/foot.php"); ?>
 </body>
 </html>

@@ -5,28 +5,23 @@
 <?php include_once("content/head.php"); ?>
 
 <body>
-    
+
     <?php include_once("content/header.php"); ?>
 
     <div class="container">
         <div class="col-md-12">
-            <h1>Current Booking</h1>
+            <h1>Invoices</h1>
 
             <table border='1'>
                 <tr>
+                    <th>Invoice Number</th>
                     <th>Parcel ID</th>
-                    <th>Parcel Name</th>
-                    <th>Receiver Name</th>
-                    <th>Receiver Address</th>
-                    <th>Receiver Phone Number</th>
-                    <th>Status</th>
-                    <th>Timestamp</th>
+                    <th>Total</th>
                 </tr>
-                <?php getAllBooking($status, $db); ?>
             </table>
         </div>
     </div>
-
+    
     <?php include_once("content/foot.php"); ?>
 </body>
 </html>
