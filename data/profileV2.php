@@ -26,9 +26,12 @@
                     <input type="text" name="address" value="<?php echo $_SESSION['address']?>" class="input_box form-control">
 
                     <button type="submit" name="save" class="btn btn-danger">Save</button>
+                    <a class="btn btn-primary" href="<?php echo $path ?>">Back</a>
                 </form>
             </div>
         </div>
     </div>
+
+    <?php include_once("content/foot.php"); ?>
 </body>
 </html>

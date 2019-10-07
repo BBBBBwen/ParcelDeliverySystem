@@ -11,9 +11,18 @@
         <div class="col-md-8">
             <h1> Welcome <?php echo $_SESSION['firstName'].' '.$_SESSION['lastName']?> </h1>
 
+            <?php 
+                if(isset($_SESSION['success'])) {
+                    echo "<div>";
+                    echo $_SESSION['success'];
+                    echo "</div>";
+                    unset($_SESSION['success']); 
+                }
+            ?>
             <a class="btn btn-primary" href="booking.php">Booking</a>
             <a class="btn btn-danger" href="allBooking.php?type=current">Current Booking</a>
             <a class="btn btn-info" href="allBooking.php?type=history">Booking History</a>
+            <a class="btn btn-warning" href="allInvoices.php">Invoices</a>
         </div>
     </div>
 

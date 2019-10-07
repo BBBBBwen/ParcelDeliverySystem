@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 27, 2019 at 01:29 PM
+-- Generation Time: Oct 07, 2019 at 07:52 AM
 -- Server version: 8.0.17
 -- PHP Version: 7.1.23
 
@@ -93,6 +93,50 @@ INSERT INTO `drivers` (`id`, `firstName`, `lastName`, `lastKnowPosition`, `statu
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inbox`
+--
+
+CREATE TABLE `inbox` (
+  `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `remark` varchar(500) COLLATE utf8_unicode_ci NOT NULL,
+  `customerID` int(11) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `inbox`
+--
+
+INSERT INTO `inbox` (`parcelID`, `remark`, `customerID`) VALUES
+('20190916080718-2', 'Testing ', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `invoices`
+--
+
+CREATE TABLE `invoices` (
+  `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `invoiceID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `customerID` int(11) NOT NULL,
+  `costAmount` decimal(10,0) NOT NULL DEFAULT '0',
+  `gstAmount` decimal(10,0) NOT NULL DEFAULT '0',
+  `deliveryAmount` decimal(10,0) NOT NULL DEFAULT '0',
+  `settle` tinyint(1) NOT NULL DEFAULT '0',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `invoices`
+--
+
+INSERT INTO `invoices` (`parcelID`, `invoiceID`, `customerID`, `costAmount`, `gstAmount`, `deliveryAmount`, `settle`) VALUES
+('20190916080718-2', '1122334455', 2, '100', '10', '20', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `parcels`
 --
 
@@ -114,6 +158,26 @@ INSERT INTO `parcels` (`id`, `customerID`, `driverID`, `pickedDate`, `deliveredD
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `parcel_location`
+--
+
+CREATE TABLE `parcel_location` (
+  `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `info` varchar(500) COLLATE utf8_unicode_ci NOT NULL,
+  `location` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `parcel_location`
+--
+
+INSERT INTO `parcel_location` (`parcelID`, `info`, `location`) VALUES
+('20190916080718-2', 'Picked Up', 'Test');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `parcel_status`
 --
 
@@ -130,6 +194,28 @@ INSERT INTO `parcel_status` (`id`, `status`) VALUES
 (1, 'pending'),
 (2, 'picked up'),
 (3, 'delivered');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment`
+--
+
+CREATE TABLE `payment` (
+  `invoiceID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cardName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cardNum` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `cardExp` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `cardCVV` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `payment`
+--
+
+INSERT INTO `payment` (`invoiceID`, `cardName`, `cardNum`, `cardExp`, `cardCVV`) VALUES
+('1122334455', 'qweqwe', '123123213213', '1111', '111');
 
 -- --------------------------------------------------------
 

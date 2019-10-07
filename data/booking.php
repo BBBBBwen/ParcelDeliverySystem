@@ -12,7 +12,7 @@
         <div class="col-md-6 col-md-offset-3">
             <h1>Booking</h1>
             <form method="POST" action="booking.php">
-                <? include('error.php'); ?>
+                <?php include('error.php'); ?>
                 <label>Parcel Name</label>
                 <input class="input_box form-control" type="text" name="parcelName">
 
@@ -26,6 +26,7 @@
                 <input class="input_box form-control" type="text" name="receiverPhone">
 
                 <button type="submit" name="booking" class="btn btn-danger">Book</button>
+                <a class="btn btn-primary" href="<?php echo $path ?>">Back</a>
             </form>
         </div>
     </div>

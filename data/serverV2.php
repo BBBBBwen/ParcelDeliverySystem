@@ -183,18 +183,158 @@ if(isset($_POST['booking'])) {
     }
 }
 
-function driverLogon($id, $db) {
-    $sql = "UPDATE drivers SET status='online' WHERE id=?";
-    $stmt = $db->prepare($sql);
-    $result = $stmt->execute([$id]);
+if(isset($_POST['payment'])) {
+    if(empty($_POST['cardnum'])) {
+        array_push($errors, "Card Number cannot be empty!");
+    }
+
+    if(empty($_POST['cardname'])) {
+        array_push($errors, "Card Name cannot be empty!");
+    }
+
+    if(empty($_POST['cardexp'])) {
+        array_push($errors, "Card Expiry cannot be empty!");
+    }
+
+    if(empty($_POST['cardcvv'])) {
+        array_push($errors, "Card CVV cannot be empty!");
+    }
+
+    if(count($errors) == 0) {
+        madePayment($db, $_POST['cardnum'], $_POST['cardname'], $_POST['cardexp'], $_POST['cardcvv'], $_POST['invoiceID']);
+    }
 }
 
+/* For customer booking list */
+if($_GET['type'] == "current") {
+    $status = "< 3";
+} else {
+    $status = "= 3";
+}
+
+/* For header path */
 if($_SESSION['user']) {
     $path = 'customerV2.php';
 } else if($_SESSION['driver']) {
     $path = 'driverV2.php';
 } else {
     $path = '/';
+}
+
+/* Get all the booking for customer, current / history */
+function getAllBooking($status, $db) {
+    $sql = "SELECT a.parcelID, a.parcelName, a.receiverName, a.receiverAddress, a.receiverPhone, b.status, a.timestamp FROM bookings a JOIN parcel_status b ON a.parcelStatus = b.id WHERE a.customerID = ? AND a.parcelStatus ".$status; 
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$_SESSION['id']]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>";
+        echo "<a href='bookingDetails.php?data=".$row['parcelID']."'>".$row['parcelID']."</a>";
+        echo "</td>";
+        echo "<td>". $row['parcelName'] ."</td>";
+        echo "<td>". $row['receiverName'] ."</td>";
+        echo "<td>". $row['receiverAddress'] ."</td>";
+        echo "<td>". $row['receiverPhone'] ."</td>";
+        echo "<td>". $row['status'] ."</td>";
+        echo "<td>". $row['timestamp'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Get specific booking details */
+function getBookingDetails($parcelID, $db) {
+    $sql = "SELECT info, location, timestamp FROM parcel_location WHERE parcelID = ? order by timestamp ASC";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$parcelID]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>". $row['info'] ."</td>";
+        echo "<td>". $row['location'] ."</td>";
+        echo "<td>". $row['timestamp'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Display all message in inbox */
+function getMessage($user, $db) {
+    $sql = "SELECT parcelID, timestamp FROM inbox WHERE customerID = ? order by timestamp DESC";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>";
+        echo "<a href='message.php?data=".$row['parcelID']."'>".$row['parcelID']."</a>";
+        echo "</td>";
+        echo "<td>". $row['timestamp'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Get specific message with remark */
+function getMessageRemark($parcelID, $user, $db) {
+    $sql = "SELECT remark FROM inbox WHERE customerID = ? AND parcelID = ?";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user, $parcelID]);
+
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    echo $data['remark'];
+}
+
+/* Get all invoice */
+function getInvoices($user, $db) {
+    $sql = "SELECT invoiceID, parcelID, settle, (costAmount + gstAmount + deliveryAmount) AS total FROM invoices WHERE customerID = ? ORDER BY timestamp DESC";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>";
+        echo "<a href='invoice.php?data=".$row['invoiceID']."'>".$row['invoiceID']."</a>";
+        echo "</td>";
+        echo "<td>". $row['parcelID'] ."</td>";
+        echo "<td>$". $row['total'] ."</td>";
+        echo "<td>". ($row['settle'] ? "Paid" : "Unpaid") ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Get invoice details */
+function getInvoiceDetails($invoiceID, $user, $db) {
+    $sql = "SELECT costAmount, gstAmount, deliveryAmount, settle FROM invoices WHERE customerID = ? AND invoiceID = ?";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user, $invoiceID]);
+    
+    return $data = $stmt->fetch(PDO::FETCH_ASSOC); 
+}
+
+/* Insert into payment table and update invoice */
+function madePayment($db, $cardnum, $cardname, $cardexp, $cardcvv, $invoiceid) {
+    $sql = "INSERT INTO payment (invoiceID, cardName, cardNum, cardExp, cardCVV) VALUES(?,?,?,?,?)";
+
+    $stmt = $db->prepare($sql);
+    $result = $stmt->execute([$invoiceid, $cardname, $cardnum, $cardexp, $cardcvv]);
+
+    if($result) {
+
+        $sql = "UPDATE invoices SET settle=1 WHERE invoiceID=?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$invoiceid]);
+
+        $_SESSION['success'] = "Payment Success for Invoice : ". $invoiceid;
+        header("Location: customerV2.php");
+    } else {
+        array_push($errors, "Failed to made payment!");
+    }
+}
+
+function driverLogon($id, $db) {
+    $sql = "UPDATE drivers SET status='online' WHERE id=?";
+    $stmt = $db->prepare($sql);
+    $result = $stmt->execute([$id]);
 }
 
 function console_log( $data ){
