@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 07, 2019 at 07:52 AM
+-- Generation Time: Oct 07, 2019 at 03:52 PM
 -- Server version: 8.0.17
 -- PHP Version: 7.1.23
 
@@ -59,15 +59,16 @@ CREATE TABLE `customers` (
   `id` int(11) NOT NULL,
   `firstName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `contactNo` varchar(20) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `customers`
 --
 
-INSERT INTO `customers` (`id`, `firstName`, `lastName`, `address`) VALUES
-(2, 'testa', 'testb', 'testc');
+INSERT INTO `customers` (`id`, `firstName`, `lastName`, `address`, `contactNo`) VALUES
+(2, 'testa', 'testb', 'testc', '0123456789');
 
 -- --------------------------------------------------------
 
@@ -137,27 +138,6 @@ INSERT INTO `invoices` (`parcelID`, `invoiceID`, `customerID`, `costAmount`, `gs
 -- --------------------------------------------------------
 
 --
--- Table structure for table `parcels`
---
-
-CREATE TABLE `parcels` (
-  `id` int(11) NOT NULL,
-  `customerID` int(11) NOT NULL,
-  `driverID` int(11) NOT NULL,
-  `pickedDate` timestamp NULL DEFAULT NULL,
-  `deliveredDate` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `parcels`
---
-
-INSERT INTO `parcels` (`id`, `customerID`, `driverID`, `pickedDate`, `deliveredDate`) VALUES
-(1, 2, 15, NULL, NULL);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `parcel_location`
 --
 
@@ -220,6 +200,28 @@ INSERT INTO `payment` (`invoiceID`, `cardName`, `cardNum`, `cardExp`, `cardCVV`)
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tasks`
+--
+
+CREATE TABLE `tasks` (
+  `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `customerID` int(11) NOT NULL,
+  `driverID` int(11) NOT NULL,
+  `pickedDate` timestamp NULL DEFAULT NULL,
+  `deliveredDate` timestamp NULL DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `tasks`
+--
+
+INSERT INTO `tasks` (`parcelID`, `customerID`, `driverID`, `pickedDate`, `deliveredDate`) VALUES
+('20190916080718-2', 2, 15, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -265,12 +267,6 @@ ALTER TABLE `drivers`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `parcels`
---
-ALTER TABLE `parcels`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `parcel_status`
 --
 ALTER TABLE `parcel_status`
@@ -298,12 +294,6 @@ ALTER TABLE `bookings`
 --
 ALTER TABLE `drivers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `parcels`
---
-ALTER TABLE `parcels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `parcel_status`

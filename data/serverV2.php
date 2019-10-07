@@ -331,6 +331,35 @@ function madePayment($db, $cardnum, $cardname, $cardexp, $cardcvv, $invoiceid) {
     }
 }
 
+/* Get all assigned task for driver */
+function getTasks($driver, $db) {
+    $sql = "SELECT t.parcelID, b.receiverName, b.receiverAddress, c.address, c.firstName, c.lastName, ps.status FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id JOIN parcel_status ps ON b.parcelStatus = ps.id WHERE t.driverID = ? AND b.parcelStatus < 3 ";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$driver]);
+
+    while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "<tr>";
+        echo "<td>";
+        echo "<a href='task.php?data=".$row['parcelID']."'>".$row['parcelID']."</a>";
+        echo "</td>";
+        echo "<td>". $row['firstName'] ." ". $row['lastName'] ."</td>";
+        echo "<td>". $row['address'] ."</td>";
+        echo "<td>". $row['receiverName'] ."</td>";
+        echo "<td>". $row['receiverAddress'] ."</td>";
+        echo "<td>". $row['status'] ."</td>";
+        echo "</tr>";
+    }
+}
+
+/* Get assigned task details for driver */
+function getTaskDetails($parcelID, $driver, $db) {
+   $sql = "SELECT b.receiverName, b.receiverAddress, b.receiverPhone, b.parcelStatus, c.address, c.firstName, c.lastName, c.contactNo FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id WHERE t.driverID = ? AND t.parcelID = ?";
+   $stmt = $db->prepare($sql);
+   $stmt->execute([$driver, $parcelID]);
+
+   return $data = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 function driverLogon($id, $db) {
     $sql = "UPDATE drivers SET status='online' WHERE id=?";
     $stmt = $db->prepare($sql);
