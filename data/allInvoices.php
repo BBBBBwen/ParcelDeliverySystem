@@ -17,7 +17,9 @@
                     <th>Invoice Number</th>
                     <th>Parcel ID</th>
                     <th>Total</th>
+                    <th>Settle</th>
                 </tr>
+                <?php getInvoices($_SESSION['id'], $db); ?>
             </table>
         </div>
     </div>
