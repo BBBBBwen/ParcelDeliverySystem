@@ -5,3 +5,11 @@ li {
 .input_box {
     margin-bottom: 10px;
 }
+
+.alert {
+    color: red;
+}
+
+.success {
+    color: blue;
+}

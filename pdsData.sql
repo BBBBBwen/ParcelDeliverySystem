@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 07, 2019 at 07:52 AM
+-- Generation Time: Oct 08, 2019 at 12:54 PM
 -- Server version: 8.0.17
 -- PHP Version: 7.1.23
 
@@ -28,8 +28,8 @@ SET time_zone = "+00:00";
 -- Table structure for table `bookings`
 --
 
-CREATE TABLE `bookings` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `bookings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `customerID` int(11) NOT NULL,
   `parcelName` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -37,8 +37,9 @@ CREATE TABLE `bookings` (
   `receiverAddress` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `receiverPhone` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
   `parcelStatus` tinyint(1) NOT NULL DEFAULT '1',
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `bookings`
@@ -46,7 +47,7 @@ CREATE TABLE `bookings` (
 
 INSERT INTO `bookings` (`id`, `parcelID`, `customerID`, `parcelName`, `receiverName`, `receiverAddress`, `receiverPhone`, `parcelStatus`) VALUES
 (1, 'sample', 2, 'Dummy', 'Dummy Test', 'Test 123', '123123', 1),
-(2, '20190916080718-2', 2, 'test1', 'r1', 'r r r r', '123123', 1),
+(2, '20190916080718-2', 2, 'test1', 'r1', 'r r r r', '123123', 3),
 (3, '20190916080849-2', 2, 'test1a', 'r2', 'b  b b b b b', '123123', 1);
 
 -- --------------------------------------------------------
@@ -55,19 +56,21 @@ INSERT INTO `bookings` (`id`, `parcelID`, `customerID`, `parcelName`, `receiverN
 -- Table structure for table `customers`
 --
 
-CREATE TABLE `customers` (
+CREATE TABLE IF NOT EXISTS `customers` (
   `id` int(11) NOT NULL,
   `firstName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `lastName` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `contactNo` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `customers`
 --
 
-INSERT INTO `customers` (`id`, `firstName`, `lastName`, `address`) VALUES
-(2, 'testa', 'testb', 'testc');
+INSERT INTO `customers` (`id`, `firstName`, `lastName`, `address`, `contactNo`) VALUES
+(2, 'testa', 'testb', 'testc', '0123456789');
 
 -- --------------------------------------------------------
 
@@ -75,13 +78,14 @@ INSERT INTO `customers` (`id`, `firstName`, `lastName`, `address`) VALUES
 -- Table structure for table `drivers`
 --
 
-CREATE TABLE `drivers` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `drivers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `lastName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `lastKnowPosition` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `drivers`
@@ -96,7 +100,7 @@ INSERT INTO `drivers` (`id`, `firstName`, `lastName`, `lastKnowPosition`, `statu
 -- Table structure for table `inbox`
 --
 
-CREATE TABLE `inbox` (
+CREATE TABLE IF NOT EXISTS `inbox` (
   `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `remark` varchar(500) COLLATE utf8_unicode_ci NOT NULL,
   `customerID` int(11) NOT NULL,
@@ -108,7 +112,8 @@ CREATE TABLE `inbox` (
 --
 
 INSERT INTO `inbox` (`parcelID`, `remark`, `customerID`) VALUES
-('20190916080718-2', 'Testing ', 2);
+('20190916080718-2', 'test', 2),
+('20190916080718-2', 'asdasd', 2);
 
 -- --------------------------------------------------------
 
@@ -116,7 +121,7 @@ INSERT INTO `inbox` (`parcelID`, `remark`, `customerID`) VALUES
 -- Table structure for table `invoices`
 --
 
-CREATE TABLE `invoices` (
+CREATE TABLE IF NOT EXISTS `invoices` (
   `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `invoiceID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `customerID` int(11) NOT NULL,
@@ -137,31 +142,10 @@ INSERT INTO `invoices` (`parcelID`, `invoiceID`, `customerID`, `costAmount`, `gs
 -- --------------------------------------------------------
 
 --
--- Table structure for table `parcels`
---
-
-CREATE TABLE `parcels` (
-  `id` int(11) NOT NULL,
-  `customerID` int(11) NOT NULL,
-  `driverID` int(11) NOT NULL,
-  `pickedDate` timestamp NULL DEFAULT NULL,
-  `deliveredDate` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `parcels`
---
-
-INSERT INTO `parcels` (`id`, `customerID`, `driverID`, `pickedDate`, `deliveredDate`) VALUES
-(1, 2, 15, NULL, NULL);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `parcel_location`
 --
 
-CREATE TABLE `parcel_location` (
+CREATE TABLE IF NOT EXISTS `parcel_location` (
   `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `info` varchar(500) COLLATE utf8_unicode_ci NOT NULL,
   `location` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
@@ -173,7 +157,10 @@ CREATE TABLE `parcel_location` (
 --
 
 INSERT INTO `parcel_location` (`parcelID`, `info`, `location`) VALUES
-('20190916080718-2', 'Picked Up', 'Test');
+('20190916080718-2', 'Picked Up', 'testc'),
+('20190916080718-2', 'Delivered', 'r r r r'),
+('20190916080718-2', 'Picked Up', 'testc'),
+('20190916080718-2', 'Delivered', 'r r r r');
 
 -- --------------------------------------------------------
 
@@ -181,10 +168,11 @@ INSERT INTO `parcel_location` (`parcelID`, `info`, `location`) VALUES
 -- Table structure for table `parcel_status`
 --
 
-CREATE TABLE `parcel_status` (
-  `id` int(11) NOT NULL,
-  `status` varchar(20) COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS `parcel_status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `parcel_status`
@@ -201,7 +189,7 @@ INSERT INTO `parcel_status` (`id`, `status`) VALUES
 -- Table structure for table `payment`
 --
 
-CREATE TABLE `payment` (
+CREATE TABLE IF NOT EXISTS `payment` (
   `invoiceID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `cardName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `cardNum` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
@@ -220,19 +208,63 @@ INSERT INTO `payment` (`invoiceID`, `cardName`, `cardNum`, `cardExp`, `cardCVV`)
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `report`
+--
+
+CREATE TABLE IF NOT EXISTS `report` (
+  `driverID` int(11) NOT NULL,
+  `report` varchar(500) COLLATE utf8_unicode_ci NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `report`
+--
+
+INSERT INTO `report` (`driverID`, `report`) VALUES
+(15, 'Test'),
+(15, 'test');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tasks`
+--
+
+CREATE TABLE IF NOT EXISTS `tasks` (
+  `parcelID` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `customerID` int(11) NOT NULL,
+  `driverID` int(11) NOT NULL,
+  `pickedDate` timestamp NULL DEFAULT NULL,
+  `deliveredDate` timestamp NULL DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `tasks`
+--
+
+INSERT INTO `tasks` (`parcelID`, `customerID`, `driverID`, `pickedDate`, `deliveredDate`) VALUES
+('20190916080718-2', 2, 15, '2019-10-08 12:37:27', '2019-10-08 12:37:28');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `is_customer` tinyint(1) NOT NULL DEFAULT '1',
   `is_driver` tinyint(1) NOT NULL DEFAULT '0',
   `is_manager` int(11) NOT NULL DEFAULT '0',
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `users`
@@ -241,81 +273,6 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `email`, `password`, `is_customer`, `is_driver`, `is_manager`, `is_admin`) VALUES
 (2, 'test@test.com', '$2y$10$RjjFtMrMIGFsvELT6qZDFuGe6ehAe3/Kxmjnj7rMJichQsG0cBDXG', 1, 0, 0, 0),
 (15, 'driver@t.com', '$2y$10$RjjFtMrMIGFsvELT6qZDFuGe6ehAe3/Kxmjnj7rMJichQsG0cBDXG', 0, 1, 0, 0);
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `bookings`
---
-ALTER TABLE `bookings`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `customers`
---
-ALTER TABLE `customers`
-  ADD KEY `id` (`id`);
-
---
--- Indexes for table `drivers`
---
-ALTER TABLE `drivers`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `parcels`
---
-ALTER TABLE `parcels`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `parcel_status`
---
-ALTER TABLE `parcel_status`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `bookings`
---
-ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `drivers`
---
-ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `parcels`
---
-ALTER TABLE `parcels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `parcel_status`
---
-ALTER TABLE `parcel_status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables

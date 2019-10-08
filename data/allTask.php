@@ -1,7 +1,4 @@
-<?php 
-include("serverV2.php"); 
-include("getAllTask.php");
-?>
+<?php include("serverV2.php"); ?>
 <!DOCTYPE html>
 <html>
 
@@ -18,23 +15,12 @@ include("getAllTask.php");
                 <tr>
                     <th>Parcel ID</th>
                     <th>Customer Name</th>
+                    <th>Customer Address</th>
                     <th>Receiver Name</th>
-                    <th>Pick Up Date</th>
-                    <th>Delivered Date</th>
+                    <th>Receiver Address</th>
+                    <th>Status</th>
                 </tr>
-                <?php
-                while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    echo "<tr>";
-                    echo "<td>";
-                    echo "<a href='task.php?data=".$row['parcelID']."'>".$row['parcelID']."</a>";
-                    echo "</td>";
-                    echo "<td>". $row['firstName'].' '. $row['lastName'] ."</td>";
-                    echo "<td>". $row['receiverName'] ."</td>";
-                    echo "<td>". $row['pickedDate'] ."</td>";
-                    echo "<td>". $row['deliveredDate'] ."</td>";
-                    echo "</tr>";
-                }
-                ?>
+                <?php getTasks($_SESSION['id'], $db); ?>
             </table>
         </div>
     </div>
