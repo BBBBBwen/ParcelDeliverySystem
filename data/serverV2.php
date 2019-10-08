@@ -205,6 +205,22 @@ if(isset($_POST['payment'])) {
     }
 }
 
+if(isset($_POST['picked'])) {
+    updateTask("picked", $_POST['parcelID'], $_POST['customerAdd'], $_SESSION['id'], $db);
+}
+
+if(isset($_POST['delivered'])) {
+    updateTask('delivered', $_POST['parcelID'], $_POST['receiverAdd'], $_SESSION['id'], $db);
+}
+
+if(isset($_POST['remark'])) {
+    setRemark($_POST['parcelID'], $_POST['remarkText'], $_SESSION['id'], $db);
+}
+
+if(isset($_POST['report'])) {
+    driverReport($_POST['reportText'], $_SESSION['id'], $db);
+}
+
 /* For customer booking list */
 if($_GET['type'] == "current") {
     $status = "< 3";
@@ -324,7 +340,7 @@ function madePayment($db, $cardnum, $cardname, $cardexp, $cardcvv, $invoiceid) {
         $stmt = $db->prepare($sql);
         $stmt->execute([$invoiceid]);
 
-        $_SESSION['success'] = "Payment Success for Invoice : ". $invoiceid;
+        $_SESSION['message'] = "Payment Success for Invoice : ". $invoiceid;
         header("Location: customerV2.php");
     } else {
         array_push($errors, "Failed to made payment!");
@@ -358,6 +374,83 @@ function getTaskDetails($parcelID, $driver, $db) {
    $stmt->execute([$driver, $parcelID]);
 
    return $data = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/* Update the task status (Picked Up and Delivered) */
+function updateTask($type, $parcelID, $address, $driver, $db) {
+    
+    if($type == "picked") {
+        $sql = "UPDATE bookings SET parcelStatus = 2 WHERE parcelID = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$parcelID]);
+
+        $sql = "UPDATE tasks SET pickedDate = now() WHERE parcelID = ? AND driverID = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$parcelID, $driver]);
+
+        $sql = "INSERT INTO parcel_location (parcelID, info, location) VALUES(?,?,?)";
+        $stmt = $db->prepare($sql);
+        $result = $stmt->execute([$parcelID, "Picked Up", $address]);
+
+        $_SESSION['message'] = "Parcel Successful Picked Up";
+    } 
+    
+    if($type == "delivered") {
+        $sql = "UPDATE bookings SET parcelStatus = 3 WHERE parcelID = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$parcelID]);
+
+        $sql = "UPDATE tasks SET deliveredDate = now() WHERE parcelID = ? AND driverID = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$parcelID, $driver]);
+
+        $sql = "INSERT INTO parcel_location (parcelID, info, location) VALUES(?,?,?)";
+        $stmt = $db->prepare($sql);
+        $result = $stmt->execute([$parcelID, "Delivered", $address]);
+
+        $_SESSION['message'] = "Parcel Successful Delivered";
+    }
+}
+
+/** Add Remark to the task **/
+function setRemark($parcelID, $remark, $driver, $db) {
+    if(!empty($remark)) {
+        $sql = "SELECT customerID FROM tasks WHERE parcelID = ? AND driverID = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$parcelID, $driver]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "INSERT INTO inbox (parcelID, remark, customerID) VALUES(?,?,?)";
+        $stmt = $db->prepare($sql);
+        $result = $stmt->execute([$parcelID, $remark, $data['customerID']]);
+
+        if($result) {
+            $_SESSION['message'] = "Remark Successful Added";
+            header("Location: task.php?data=".$parcelID);
+        } else {
+            $_SESSION['failedMsg'] = "Failed To Add Remark!";
+        }
+    } else {
+        $_SESSION['failedMsg'] = "Cannot submit empty remark!";
+    }
+}
+
+/* Driver report */
+function driverReport($text, $driver, $db) {
+    if(!empty($text)) {
+        $sql = "INSERT INTO report (driverID, report) VALUES(?,?)";
+        $stmt = $db->prepare($sql);
+        $result = $stmt->execute([$driver, $text]);
+
+        if($result) {
+            $_SESSION['message'] = "Report submitted.";
+            header("Location: driverV2.php");
+        } else {
+            $_SESSION['failedMsg'] = "Failed to report!";
+        }
+    } else {
+        $_SESSION['failedMsg'] = "Cannot submit empty report!";
+    }
 }
 
 function driverLogon($id, $db) {
