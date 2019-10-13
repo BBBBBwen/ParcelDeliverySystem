@@ -16,5 +16,9 @@ handlers:
 
 env_variables:
   CLOUDSQL_DSN:  mysql:dbname=pdsData;unix_socket=/cloudsql/isys1106-pds:australia-southeast1:sepm-assginment
+<<<<<<< Updated upstream
+=======
+  # CLOUDSQL_DSN: mysql:host=localhost;dbname=pdsData
+>>>>>>> Stashed changes
   CLOUDSQL_USER: root
   CLOUDSQL_PASSWORD: 123456
