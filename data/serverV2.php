@@ -55,7 +55,6 @@ if(isset($_POST['login'])) {
                 $_SESSION['email'] = $_POST['email'];
 
                 driverLogon($user['id'], $db);
-
                 header("Location: driverV2.php");
             } else if($user['is_admin'] > 0) {
 
@@ -210,11 +209,11 @@ if(isset($_POST['payment'])) {
 }
 
 if(isset($_POST['picked'])) {
-    updateTask("picked", $_POST['parcelID'], $_POST['customerAdd'], $_SESSION['id'], $db);
+    updateTask("picked", $_POST['parcelID'], $_SESSION['id'], $db);
 }
 
 if(isset($_POST['delivered'])) {
-    updateTask('delivered', $_POST['parcelID'], $_POST['receiverAdd'], $_SESSION['id'], $db);
+    updateTask('delivered', $_POST['parcelID'], $_SESSION['id'], $db);
 }
 
 if(isset($_POST['remark'])) {
@@ -382,12 +381,11 @@ function getTaskDetails($parcelID, $driver, $db) {
 
 
 function assginTask($driverID, $db) {
-    $sql = "SELECT * FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id JOIN parcel_status ps ON b.parcelStatus = ps.id WHERE t.driverID = ? AND b.parcelStatus = 1 ";
+    $sql = "SELECT * FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id JOIN parcel_status ps ON b.parcelStatus = ps.id WHERE t.driverID = ? AND b.parcelStatus < 3";
     $stmt = $db->prepare($sql);
     $stmt->execute([$driverID]);
 
     if($stmt->rowCount() < 1 && isset($_SESSION['id'])) {
-        require 'tracking.php';
         $sql = "SELECT * FROM drivers WHERE id=:driverID;";
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':driverID', $driverID);
@@ -437,12 +435,18 @@ function getDistace($from, $to) {
 }
 
 /* Update the task status (Picked Up and Delivered) */
-function updateTask($type, $parcelID, $address, $driver, $db) {
+function updateTask($type, $parcelID, $driver, $db) {
     $sql = "SELECT * FROM bookings WHERE parcelID=:parcelID;";
     $stmt = $db->prepare($sql);
     $stmt->bindValue(':parcelID', $parcelID);
     $stmt->execute();
     $stat = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $sql = "SELECT * FROM drivers WHERE id = ?;";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$driver]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $address = $result['lastKnowPosition'];
 
     if($type == "picked" && $stat['parcelStatus'] == 1) {
         $sql = "UPDATE bookings SET parcelStatus = 2 WHERE parcelID = ?";
