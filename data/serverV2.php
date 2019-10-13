@@ -382,8 +382,12 @@ function getTaskDetails($parcelID, $driver, $db) {
 
 
 function assginTask($driverID, $db) {
+    $sql = "SELECT * FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id JOIN parcel_status ps ON b.parcelStatus = ps.id WHERE t.driverID = ? AND b.parcelStatus < 3 ";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$driver]);
+    $result = $stmt->execute();
 
-    if(isset($_SESSION['id'])) {
+    if(!$result && isset($_SESSION['id'])) {
         require 'tracking.php';
         $sql = "SELECT * FROM drivers WHERE id=:driverID;";
         $stmt = $db->prepare($sql);
@@ -417,7 +421,6 @@ function assginTask($driverID, $db) {
             $selectParcelID = $data['parcelID'];
             $minDis = getDistace($address, $data['address']);
         }
-        echo $selectParcelID." : ".$selectID." : ".$driverID;
         $sql = "INSERT INTO tasks (parcelID, customerID, driverID) VALUES(:parcelID, :customerID, :driverID)";
         $stmt = $db->prepare($sql);
         $stmt->bindValue(':parcelID', $selectParcelID);
@@ -431,14 +434,18 @@ function getDistace($from, $to) {
     $distanceData = file_get_contents("https://maps.googleapis.com/maps/api/distancematrix/json?&origins=".urlencode($from)."&destinations=".urlencode($to)."&key=AIzaSyB4VlCHHZgZ1rrsEY9S-LtYdMz-f858Dig");
     $data = json_decode($distanceData);
     $distance = floor($data->rows[0]->elements[0]->distance->value / 1000);
-    echo $data->rows[0]->elements[0]->distance->value;
     return $distance;
 }
 
 /* Update the task status (Picked Up and Delivered) */
 function updateTask($type, $parcelID, $address, $driver, $db) {
+    $sql = "SELECT parcelStatus FROM bookings WHERE parcelID=:parcelID;";
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':driverID', $parcelID);
+    $stmt->execute();
+    $stat = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if($type == "picked") {
+    if($type == "picked" && $stat == 1) {
         $sql = "UPDATE bookings SET parcelStatus = 2 WHERE parcelID = ?";
         $stmt = $db->prepare($sql);
         $stmt->execute([$parcelID]);
@@ -454,7 +461,7 @@ function updateTask($type, $parcelID, $address, $driver, $db) {
         $_SESSION['message'] = "Parcel Successful Picked Up";
     }
 
-    if($type == "delivered") {
+    if($type == "delivered" $stat == 2) {
         $sql = "UPDATE bookings SET parcelStatus = 3 WHERE parcelID = ?";
         $stmt = $db->prepare($sql);
         $stmt->execute([$parcelID]);

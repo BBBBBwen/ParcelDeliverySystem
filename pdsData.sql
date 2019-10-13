@@ -2,10 +2,10 @@
 -- version 4.9.0.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Sep 04, 2019 at 06:44 PM
+-- Host: localhost
+-- Generation Time: Oct 08, 2019 at 12:54 PM
 -- Server version: 8.0.17
--- PHP Version: 7.3.8
+-- PHP Version: 7.1.23
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,27 +19,14 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `pdsdata`
+-- Database: `pdsData`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `customer`
+-- Table structure for table `bookings`
 --
-<<<<<<< Updated upstream
-
-DROP TABLE IF EXISTS `customer`;
-CREATE TABLE IF NOT EXISTS `customer` (
-  `id` int(100) NOT NULL AUTO_INCREMENT,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `firstName` varchar(20) NOT NULL,
-  `lastName` varchar(20) NOT NULL,
-  `address` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-=======
 DROP TABLE IF EXISTS `bookings`;
 CREATE TABLE IF NOT EXISTS `bookings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -57,28 +44,12 @@ CREATE TABLE IF NOT EXISTS `bookings` (
 --
 -- Dumping data for table `bookings`
 --
->>>>>>> Stashed changes
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `driver`
+-- Table structure for table `customers`
 --
-<<<<<<< Updated upstream
-
-DROP TABLE IF EXISTS `driver`;
-CREATE TABLE IF NOT EXISTS `driver` (
-  `id` int(100) NOT NULL AUTO_INCREMENT,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `firstName` varchar(20) NOT NULL,
-  `lastName` varchar(20) NOT NULL,
-  `total` int(100) NOT NULL DEFAULT '0',
-  `paid` int(100) NOT NULL DEFAULT '0',
-  `lastKnowCoordinate` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-=======
 DROP TABLE IF EXISTS `customers`;
 CREATE TABLE IF NOT EXISTS `customers` (
   `id` int(11) NOT NULL,
@@ -115,31 +86,10 @@ CREATE TABLE IF NOT EXISTS `drivers` (
 INSERT INTO `drivers` (`id`, `firstName`, `lastName`, `lastKnowPosition`, `status`) VALUES
 (15, 'Driver Test', 'Test', NULL, 0),
 (20, 'Driver', 'A', NULL, 0);
->>>>>>> Stashed changes
 
 -- --------------------------------------------------------
 
 --
-<<<<<<< Updated upstream
--- Table structure for table `parcel`
---
-
-DROP TABLE IF EXISTS `parcel`;
-CREATE TABLE IF NOT EXISTS `parcel` (
-  `id` int(100) NOT NULL AUTO_INCREMENT,
-  `customerID` int(100) NOT NULL,
-  `driverID` int(100) DEFAULT NULL,
-  `parcelName` varchar(100) NOT NULL,
-  `recieverName` varchar(100) NOT NULL,
-  `recieverAddress` varchar(100) NOT NULL,
-  `recieverPhoneNumber` varchar(100) NOT NULL,
-  `pickUpDate` varchar(100) DEFAULT NULL,
-  `endDate` varchar(100) DEFAULT NULL,
-  `status` varchar(100) NOT NULL DEFAULT 'processing',
-  `payment` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-=======
 -- Table structure for table `inbox`
 --
 DROP TABLE IF EXISTS `inbox`;
@@ -303,7 +253,6 @@ INSERT INTO `users` (`id`, `email`, `password`, `is_customer`, `is_driver`, `is_
 --
 ALTER TABLE `customers`
   ADD CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
->>>>>>> Stashed changes
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
