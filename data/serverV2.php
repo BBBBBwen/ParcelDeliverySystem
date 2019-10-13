@@ -382,12 +382,11 @@ function getTaskDetails($parcelID, $driver, $db) {
 
 
 function assginTask($driverID, $db) {
-    $sql = "SELECT * FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id JOIN parcel_status ps ON b.parcelStatus = ps.id WHERE t.driverID = ? AND b.parcelStatus < 3 ";
+    $sql = "SELECT * FROM tasks t JOIN bookings b ON t.parcelID = b.parcelID JOIN customers c ON t.customerID = c.id JOIN parcel_status ps ON b.parcelStatus = ps.id WHERE t.driverID = ? AND b.parcelStatus = 1 ";
     $stmt = $db->prepare($sql);
-    $stmt->execute([$driver]);
-    $result = $stmt->execute();
+    $stmt->execute([$driverID]);
 
-    if(!$result && isset($_SESSION['id'])) {
+    if($stmt->rowCount() < 1 && isset($_SESSION['id'])) {
         require 'tracking.php';
         $sql = "SELECT * FROM drivers WHERE id=:driverID;";
         $stmt = $db->prepare($sql);
@@ -439,13 +438,13 @@ function getDistace($from, $to) {
 
 /* Update the task status (Picked Up and Delivered) */
 function updateTask($type, $parcelID, $address, $driver, $db) {
-    $sql = "SELECT parcelStatus FROM bookings WHERE parcelID=:parcelID;";
+    $sql = "SELECT * FROM bookings WHERE parcelID=:parcelID;";
     $stmt = $db->prepare($sql);
-    $stmt->bindValue(':driverID', $parcelID);
+    $stmt->bindValue(':parcelID', $parcelID);
     $stmt->execute();
     $stat = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if($type == "picked" && $stat == 1) {
+    if($type == "picked" && $stat['parcelStatus'] == 1) {
         $sql = "UPDATE bookings SET parcelStatus = 2 WHERE parcelID = ?";
         $stmt = $db->prepare($sql);
         $stmt->execute([$parcelID]);
@@ -461,7 +460,7 @@ function updateTask($type, $parcelID, $address, $driver, $db) {
         $_SESSION['message'] = "Parcel Successful Picked Up";
     }
 
-    if($type == "delivered" $stat == 2) {
+    if($type == "delivered" && $stat['parcelStatus'] == 2) {
         $sql = "UPDATE bookings SET parcelStatus = 3 WHERE parcelID = ?";
         $stmt = $db->prepare($sql);
         $stmt->execute([$parcelID]);
